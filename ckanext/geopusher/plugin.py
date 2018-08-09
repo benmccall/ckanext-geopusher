@@ -31,18 +31,18 @@ class GeopusherPlugin(plugins.SingletonPlugin):
                 site_url = config.get('ckan.site_url', 'http://localhost/')
                 apikey = model.User.get('default').apikey
 
-				    u'''
-                    Enqueue a background job using RQ (CKAN 2.7+). Fallback to Celery (CKAN 1.5+).
-                    '''
-                    try:
-                        # Try to use RQ
-						from ckan.plugins.toolkit import enqueue_job
-                        enqueue_job(ckanext.geopusher.plugin.process_resource, args=[resource_id, site_url, apikey])
-                    except ImportError:
-                        # Fallback to Celery
-                        import uuid
-                        from ckan.lib.celery_app import celery
-                        celery.send_task(
-                            'geopusher.process_resource',
-                            args=[resource_id, site_url, apikey],
-                            task_id='{}-{}'.format(str(uuid.uuid4()), operation))
+                u'''
+                Enqueue a background job using RQ (CKAN 2.7+). Fallback to Celery (CKAN 1.5+).
+                '''
+                try:
+                    # Try to use RQ
+                    from ckan.plugins.toolkit import enqueue_job
+                    enqueue_job(ckanext.geopusher.plugin.process_resource, args=[resource_id, site_url, apikey])
+                except ImportError:
+                    # Fallback to Celery
+                    import uuid
+                    from ckan.lib.celery_app import celery
+                    celery.send_task(
+                        'geopusher.process_resource',
+                        args=[resource_id, site_url, apikey],
+                        task_id='{}-{}'.format(str(uuid.uuid4()), operation))
